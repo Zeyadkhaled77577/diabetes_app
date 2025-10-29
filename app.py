@@ -8,13 +8,11 @@ st.write("Enter the patient data and select a model to predict the risk of diabe
 # --- Model selection ---
 model_choice = st.selectbox("Choose model", ["LightGBM", "XGBoost"])
 
-# Load model based on selection
+# --- Load model based on selection ---
 if model_choice == "LightGBM":
-    model_path = r"C:\Users\user\Desktop\Asmaa\Light\lightgbm_pipeline.pkl"
+    model = joblib.load("lightgbm_pipeline.pkl")
 else:
-    model_path = r"C:\Users\user\Desktop\Asmaa\Light\C__Users_user_Desktop_Asmaa_Light_xgboost_pipeline.pkl"
-
-model = joblib.load(model_path)
+    model = joblib.load("xgboost_pipeline.pkl")
 
 # --- User inputs ---
 age = st.number_input("Age", min_value=0, max_value=120, value=30)
@@ -26,7 +24,7 @@ blood_glucose_level = st.number_input("Blood Glucose Level", min_value=0.0, max_
 gender = st.selectbox("Gender", ["Male", "Female", "Other"])
 smoking_history = st.selectbox("Smoking History", ["current", "ever", "former", "never", "not current"])
 
-# --- Input DataFrame with raw columns ---
+# --- Input DataFrame ---
 input_data = pd.DataFrame({
     'age': [age],
     'hypertension': [hypertension],
@@ -42,7 +40,6 @@ input_data = pd.DataFrame({
 if st.button("Predict Diabetes"):
     prediction = model.predict(input_data)[0]
     
-    # Some models may not have predict_proba
     probability = model.predict_proba(input_data)[0][1] if hasattr(model, "predict_proba") else None
 
     if prediction == 1:
